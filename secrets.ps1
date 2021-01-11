@@ -40,6 +40,14 @@ function Secrets-New-XtiVersion {
     $script:secretsConfig | New-XtiVersion @PsBoundParameters
 }
 
+function Secrets-Xti-Merge {
+    param(
+        [Parameter(Position=0)]
+        [string] $CommitMessage
+    )
+    $script:secretsConfig | Xti-Merge @PsBoundParameters
+}
+
 function Secrets-New-XtiPullRequest {
     param(
         [Parameter(Position=0)]
@@ -59,4 +67,7 @@ function Secrets-Publish {
         [switch] $Prod
     )
     $script:secretsConfig | Xti-PublishPackage @PsBoundParameters
+    if($Prod) {
+        $script:secretsConfig | Xti-Merge
+    }
 }
