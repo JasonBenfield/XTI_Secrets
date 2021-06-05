@@ -33,5 +33,14 @@ namespace XTI_Secrets.Extensions
                 return new FileSecretCredentialsFactory(hostEnv, dataProtector);
             });
         }
+
+        public static void AddSharedFileSecretCredentials(this IServiceCollection services)
+        {
+            services.AddSingleton(sp =>
+            {
+                var dataProtector = sp.GetDataProtector(new[] { "XTI_Secrets" });
+                return new SharedFileSecretCredentialsFactory(dataProtector);
+            });
+        }
     }
 }

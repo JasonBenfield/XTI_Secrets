@@ -7,12 +7,13 @@ namespace XTI_Secrets.Files
     {
         private readonly IHostEnvironment hostEnv;
 
-        public FileSecretCredentialsFactory(IHostEnvironment hostEnv, IDataProtector dataProtector) : base(dataProtector)
+        public FileSecretCredentialsFactory(IHostEnvironment hostEnv, IDataProtector dataProtector)
+            : base(dataProtector)
         {
             this.hostEnv = hostEnv;
         }
 
         protected override SecretCredentials _Create(string key, IDataProtector dataProtector) =>
-            new FileSecretCredentials(hostEnv, key, dataProtector);
+            new FileSecretCredentials(hostEnv.EnvironmentName, key, dataProtector);
     }
 }
