@@ -17,6 +17,10 @@ namespace XTI_Secrets
 
         public string Value()
         {
+            if (string.IsNullOrWhiteSpace(encryptedText))
+            {
+                throw new ArgumentException("Encrypted text cannot be blank");
+            }
             var protectedBytes = Convert.FromBase64String(encryptedText);
             var unprotectedBytes = dataProtector.Unprotect(protectedBytes);
             return UTF8Encoding.UTF8.GetString(unprotectedBytes);

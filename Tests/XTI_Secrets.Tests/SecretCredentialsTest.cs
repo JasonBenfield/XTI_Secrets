@@ -9,13 +9,14 @@ using XTI_Secrets.Fakes;
 
 namespace XTI_Secrets.Tests
 {
-    public class SecretCredentialsTest
+    public sealed class SecretCredentialsTest
     {
         [Test]
         public async Task ShouldStoreAndRetrieveCredentials()
         {
-            var input = setup();
-            var secretCredentials = input.Factory.Create("Test");
+            var sp = setup();
+            var factory = getSecretCredentailsFactory(sp);
+            var secretCredentials = factory.Create("Test");
             var storedCredentials = new CredentialValue("Someone", "Password");
             await secretCredentials.Update(storedCredentials);
             var retrievedCredentials = await secretCredentials.Value();
@@ -25,8 +26,9 @@ namespace XTI_Secrets.Tests
         [Test]
         public async Task ShouldEncryptCredentials()
         {
-            var input = setup();
-            var secretCredentials = (FakeSecretCredentials)input.Factory.Create("Test");
+            var sp = setup();
+            var factory = getSecretCredentailsFactory(sp);
+            var secretCredentials = factory.Create("Test");
             var storedCredentials = new CredentialValue("Someone", "Password");
             await secretCredentials.Update(storedCredentials);
             Assert.That
@@ -37,7 +39,7 @@ namespace XTI_Secrets.Tests
             );
         }
 
-        private TestInput setup()
+        private IServiceProvider setup()
         {
             var host = Host.CreateDefaultBuilder()
                 .ConfigureServices
@@ -49,18 +51,10 @@ namespace XTI_Secrets.Tests
                 )
                 .Build();
             var scope = host.Services.CreateScope();
-            var sp = scope.ServiceProvider;
-            return new TestInput(sp);
+            return scope.ServiceProvider;
         }
 
-        private sealed class TestInput
-        {
-            public TestInput(IServiceProvider sp)
-            {
-                Factory = (FakeSecretCredentialsFactory)sp.GetService<SecretCredentialsFactory>();
-            }
-
-            public FakeSecretCredentialsFactory Factory { get; }
-        }
+        private FakeSecretCredentialsFactory getSecretCredentailsFactory(IServiceProvider sp)
+            => (FakeSecretCredentialsFactory)sp.GetService<SecretCredentialsFactory>();
     }
 }

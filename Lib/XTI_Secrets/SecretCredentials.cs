@@ -16,6 +16,16 @@ namespace XTI_Secrets
             this.dataProtector = dataProtector;
         }
 
+        public void Delete()
+        {
+            if (Exist())
+            {
+                _Delete(key);
+            }
+        }
+
+        protected abstract void _Delete(string key);
+
         public Task Update(string userName, string password) =>
             Update(new CredentialValue(userName, password));
 
@@ -27,6 +37,10 @@ namespace XTI_Secrets
         }
 
         protected abstract Task Persist(string key, string encryptedText);
+
+        public bool Exist() => _Exist(key);
+
+        protected abstract bool _Exist(string key);
 
         public async Task<CredentialValue> Value()
         {

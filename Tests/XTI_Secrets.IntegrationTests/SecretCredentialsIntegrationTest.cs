@@ -14,15 +14,16 @@ namespace XTI_Secrets.IntegrationTests
         [Test]
         public async Task ShouldStoreAndRetrieveCredentials()
         {
-            var input = setup();
-            var secretCredentials = input.Factory.Create("Test");
+            var sp = setup();
+            var factory = getSecretCredentialsFactory(sp);
+            var secretCredentials = factory.Create("Test");
             var storedCredentials = new CredentialValue("Someone", "Password");
             await secretCredentials.Update(storedCredentials);
             var retrievedCredentials = await secretCredentials.Value();
             Assert.That(retrievedCredentials, Is.EqualTo(storedCredentials), "Should store and retrieve credentials");
         }
 
-        private TestInput setup()
+        private IServiceProvider setup()
         {
             Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", "Test");
             var host = Host.CreateDefaultBuilder()
@@ -37,19 +38,10 @@ namespace XTI_Secrets.IntegrationTests
                 })
                 .Build();
             var scope = host.Services.CreateScope();
-            var sp = scope.ServiceProvider;
-            var input = new TestInput(sp);
-            return input;
+            return scope.ServiceProvider;
         }
 
-        private sealed class TestInput
-        {
-            public TestInput(IServiceProvider sp)
-            {
-                Factory = sp.GetService<SecretCredentialsFactory>();
-            }
-
-            public SecretCredentialsFactory Factory { get; }
-        }
+        private SecretCredentialsFactory getSecretCredentialsFactory(IServiceProvider sp)
+            => sp.GetService<SecretCredentialsFactory>();
     }
 }
