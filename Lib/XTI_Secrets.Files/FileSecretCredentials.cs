@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.DataProtection;
-using Microsoft.Extensions.Hosting;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using XTI_Core;
@@ -10,28 +10,34 @@ namespace XTI_Secrets.Files
     {
         private readonly AppDataFolder appDataFolder;
 
-        public FileSecretCredentials(IHostEnvironment hostEnv, string key, IDataProtector dataProtector)
+        internal FileSecretCredentials(string envName, string key, IDataProtector dataProtector)
             : base(key, dataProtector)
         {
             appDataFolder = new AppDataFolder()
-                .WithHostEnvironment(hostEnv)
+                .WithSubFolder(envName)
                 .WithSubFolder("Secrets");
+        }
+
+        protected override void _Delete(string key) => File.Delete(getFilePath(key));
+
+        protected override bool _Exist(string key)
+        {
+            var filePath = getFilePath(key);
+            return File.Exists(filePath);
         }
 
         protected override async Task<string> Load(string key)
         {
             string text;
             var filePath = getFilePath(key);
-            if (File.Exists(getFilePath(key)))
+            if (File.Exists(filePath))
             {
-                using (var reader = new StreamReader(filePath))
-                {
-                    text = await reader.ReadToEndAsync();
-                }
+                using var reader = new StreamReader(filePath);
+                text = await reader.ReadToEndAsync();
             }
             else
             {
-                text = "";
+                throw new ArgumentException("Secrets file was not found");
             }
             return text;
         }

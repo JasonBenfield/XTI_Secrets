@@ -12,6 +12,8 @@ namespace XTI_Secrets.Fakes
 
         private readonly Dictionary<string, FakeSecretCredentials> credentialLookup = new Dictionary<string, FakeSecretCredentials>();
 
+        public new FakeSecretCredentials Create(string key) => (FakeSecretCredentials)base.Create(key);
+
         protected override SecretCredentials _Create(string key, IDataProtector dataProtector)
         {
             if (!credentialLookup.TryGetValue(key, out var secretCredentials))

@@ -11,6 +11,16 @@ namespace XTI_Secrets.Fakes
 
         public string StoredText { get; private set; }
 
+        public bool IsDeleted { get; private set; }
+
+        protected override void _Delete(string key)
+        {
+            IsDeleted = true;
+            StoredText = null;
+        }
+
+        protected override bool _Exist(string key) => !string.IsNullOrWhiteSpace(StoredText);
+
         protected override Task<string> Load(string key) => Task.FromResult(StoredText);
 
         protected override Task Persist(string key, string encryptedText)
