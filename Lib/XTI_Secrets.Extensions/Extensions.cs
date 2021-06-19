@@ -26,17 +26,18 @@ namespace XTI_Secrets.Extensions
 
         public static void AddFileSecretCredentials(this IServiceCollection services)
         {
-            services.AddSingleton<SecretCredentialsFactory>(sp =>
+            services.AddSingleton<ISecretCredentialsFactory>(sp =>
             {
                 var hostEnv = sp.GetService<IHostEnvironment>();
                 var dataProtector = sp.GetDataProtector(new[] { "XTI_Secrets" });
                 return new FileSecretCredentialsFactory(hostEnv, dataProtector);
             });
+            services.AddSingleton(sp => (SecretCredentialsFactory)sp.GetService<ISecretCredentialsFactory>());
         }
 
         public static void AddSharedFileSecretCredentials(this IServiceCollection services)
         {
-            services.AddSingleton(sp =>
+            services.AddSingleton<SharedSecretCredentialsFactory>(sp =>
             {
                 var dataProtector = sp.GetDataProtector(new[] { "XTI_Secrets" });
                 return new SharedFileSecretCredentialsFactory(dataProtector);
