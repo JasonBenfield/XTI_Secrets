@@ -2,7 +2,7 @@
 
 namespace XTI_Secrets
 {
-    public abstract class SecretCredentialsFactory
+    public abstract class SecretCredentialsFactory : ISecretCredentialsFactory
     {
         private readonly IDataProtector dataProtector;
 

@@ -2,7 +2,7 @@
 
 namespace XTI_Secrets.Files
 {
-    public sealed class SharedFileSecretCredentialsFactory : SecretCredentialsFactory
+    public sealed class SharedFileSecretCredentialsFactory : SecretCredentialsFactory, SharedSecretCredentialsFactory
     {
         public SharedFileSecretCredentialsFactory(IDataProtector dataProtector)
             : base(dataProtector)
