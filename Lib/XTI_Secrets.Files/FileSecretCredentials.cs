@@ -8,11 +8,15 @@ namespace XTI_Secrets.Files
 {
     public sealed class FileSecretCredentials : SecretCredentials
     {
+        private readonly AppDataFolder sharedAppDataFolder;
         private readonly AppDataFolder appDataFolder;
 
         internal FileSecretCredentials(string envName, string key, IDataProtector dataProtector)
             : base(key, dataProtector)
         {
+            sharedAppDataFolder = new AppDataFolder()
+                .WithSubFolder("Shared")
+                .WithSubFolder("Secrets");
             appDataFolder = new AppDataFolder()
                 .WithSubFolder(envName)
                 .WithSubFolder("Secrets");
@@ -45,12 +49,24 @@ namespace XTI_Secrets.Files
         protected override async Task Persist(string key, string encryptedText)
         {
             appDataFolder.TryCreate();
-            using (var writer = new StreamWriter(getFilePath(key), false))
+            using (var writer = new StreamWriter(getExplicitFilePath(key), false))
             {
                 await writer.WriteAsync(encryptedText);
             }
         }
 
-        private string getFilePath(string key) => appDataFolder.FilePath($"{key}.secret");
+        private string getFilePath(string key)
+        {
+            var filePath = getExplicitFilePath(key);
+            if (!File.Exists(filePath))
+            {
+                filePath = getSharedFilePath(key);
+            }
+            return filePath;
+        }
+
+        private string getExplicitFilePath(string key) => appDataFolder.FilePath($"{key}.secret");
+
+        private string getSharedFilePath(string key) => sharedAppDataFolder.FilePath($"{key}.secret");
     }
 }
