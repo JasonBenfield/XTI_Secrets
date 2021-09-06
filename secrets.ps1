@@ -5,21 +5,27 @@ $script:secretsConfig = [PSCustomObject]@{
     RepoName = "XTI_Secrets"
     AppName = "XTI_Secrets"
     AppType = "Package"
-    ProjectDir = ""
 }
 
-function Secrets-New-XtiIssue {
+function Secrets-NewVersion {
+    param(
+        [Parameter(Position=0)]
+        [ValidateSet("major", "minor", "patch")]
+        $VersionType = "minor"
+    )
+    $script:secretsConfig | New-XtiVersion @PsBoundParameters
+}
+
+function Secrets-NewIssue {
     param(
         [Parameter(Mandatory, Position=0)]
         [string] $IssueTitle,
-        $Labels = @(),
-        [string] $Body = "",
         [switch] $Start
     )
     $script:secretsConfig | New-XtiIssue @PsBoundParameters
 }
 
-function Secrets-Xti-StartIssue {
+function Secrets-StartIssue {
     param(
         [Parameter(Position=0)]
         [long]$IssueNumber = 0,
@@ -29,45 +35,16 @@ function Secrets-Xti-StartIssue {
     $script:secretsConfig | Xti-StartIssue @PsBoundParameters
 }
 
-function Secrets-New-XtiVersion {
-    param(
-        [Parameter(Position=0)]
-        [ValidateSet("major", "minor", "patch")]
-        $VersionType = "minor",
-        [ValidateSet("Development", "Production", "Staging", "Test")]
-        $EnvName = "Production"
-    )
-    $script:secretsConfig | New-XtiVersion @PsBoundParameters
-}
-
-function Secrets-Xti-Merge {
-    param(
-        [Parameter(Position=0)]
-        [string] $CommitMessage
-    )
-    $script:secretsConfig | Xti-Merge @PsBoundParameters
-}
-
-function Secrets-New-XtiPullRequest {
-    param(
-        [Parameter(Position=0)]
-        [string] $CommitMessage
-    )
-    $script:secretsConfig | New-XtiPullRequest @PsBoundParameters
-}
-
-function Secrets-Xti-PostMerge {
+function Secrets-CompleteIssue {
     param(
     )
-    $script:secretsConfig | Xti-PostMerge @PsBoundParameters
+    $script:secretsConfig | Xti-CompleteIssue @PsBoundParameters
 }
 
 function Secrets-Publish {
     param(
-        [switch] $Prod
+        [ValidateSet("Development", "Production", "Staging", "Test")]
+        $EnvName = "Development"
     )
-    $script:secretsConfig | Xti-PublishPackage @PsBoundParameters
-    if($Prod) {
-        $script:secretsConfig | Xti-Merge
-    }
+    $script:secretsConfig | Xti-Publish @PsBoundParameters
 }

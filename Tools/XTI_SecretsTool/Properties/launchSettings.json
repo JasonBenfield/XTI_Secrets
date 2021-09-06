@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "XTI_SecretsTool": {
+      "commandName": "Project",
+      "commandLineArgs": "--Command Get --CredentialKey WebApp",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

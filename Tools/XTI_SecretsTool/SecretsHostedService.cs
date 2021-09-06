@@ -76,7 +76,6 @@ namespace XTI_SecretsTool
             {
                 credentialFactory = scope.ServiceProvider.GetService<SecretCredentialsFactory>();
             }
-
             return credentialFactory;
         }
 
