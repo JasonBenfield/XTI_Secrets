@@ -24,7 +24,7 @@ namespace XTI_SecretsTool
                     (hostContext, services) =>
                     {
                         services.Configure<SecretsToolOptions>(hostContext.Configuration);
-                        services.AddDataProtection();
+                        services.AddXtiDataProtection();
                         services.AddFileSecretCredentials();
                         services.AddSharedFileSecretCredentials();
                         services.AddHostedService<SecretsHostedService>();

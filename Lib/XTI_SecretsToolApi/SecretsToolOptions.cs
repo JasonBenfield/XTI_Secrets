@@ -18,7 +18,7 @@
 
         public void CommandGet(string credentialKey)
         {
-            Command = "Store";
+            Command = "Get";
             CredentialKey = credentialKey;
         }
     }
