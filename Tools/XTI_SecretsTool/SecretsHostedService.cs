@@ -43,6 +43,7 @@ namespace XTI_SecretsTool
                     var credentialFactory = getSecretCredentialsFactory(scope, options);
                     var secretCredentials = credentialFactory.Create(options.CredentialKey);
                     await secretCredentials.Update(new CredentialValue(options.UserName, options.Password));
+                    Console.WriteLine($"Secrets stored for user {options.UserName}");
                 }
                 else if (options.Command.Equals("Get", StringComparison.OrdinalIgnoreCase))
                 {
