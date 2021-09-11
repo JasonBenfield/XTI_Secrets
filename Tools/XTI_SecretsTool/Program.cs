@@ -11,7 +11,7 @@ namespace XTI_SecretsTool
     class Program
     {
         static Task Main(string[] args)
-            => Host.CreateDefaultBuilder()
+            => Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration
                 (
                     (hostContext, configuration) =>

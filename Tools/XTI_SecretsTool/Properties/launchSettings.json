@@ -2,7 +2,7 @@
   "profiles": {
     "XTI_SecretsTool": {
       "commandName": "Project",
-      "commandLineArgs": "--Command Get --CredentialKey WebApp",
+      "commandLineArgs": "--Command \"Store\" --CredentialKey \"System_User_Service_TempLog\" --UserName \"xti_sys_templog_service_guinevere\" --Password \"03c5d207563549fdbd3a481d7a28f9fe?!?\"",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
