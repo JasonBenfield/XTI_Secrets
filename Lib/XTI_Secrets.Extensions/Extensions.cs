@@ -12,35 +12,29 @@ namespace XTI_Secrets.Extensions
         public static void AddXtiDataProtection(this IServiceCollection services)
         {
             const string appName = "XTI_App";
-            var keyDirPath = new AppDataFolder()
-                .WithSubFolder("Keys")
-                .Path();
             services
                 .AddDataProtection
                 (
                     options => options.ApplicationDiscriminator = appName
                 )
-                .PersistKeysToFileSystem(new DirectoryInfo(keyDirPath))
                 .SetApplicationName(appName);
         }
 
         public static void AddFileSecretCredentials(this IServiceCollection services)
         {
+            services.AddXtiDataProtection();
             services.AddSingleton<ISecretCredentialsFactory>(sp =>
             {
-                var hostEnv = sp.GetService<IHostEnvironment>();
+                var xtiFolder = sp.GetService<XtiFolder>();
                 var dataProtector = sp.GetDataProtector(new[] { "XTI_Secrets" });
-                return new FileSecretCredentialsFactory(hostEnv, dataProtector);
+                return new FileSecretCredentialsFactory(xtiFolder, dataProtector);
             });
             services.AddSingleton(sp => (SecretCredentialsFactory)sp.GetService<ISecretCredentialsFactory>());
-        }
-
-        public static void AddSharedFileSecretCredentials(this IServiceCollection services)
-        {
             services.AddSingleton<SharedSecretCredentialsFactory>(sp =>
             {
+                var xtiFolder = sp.GetService<XtiFolder>();
                 var dataProtector = sp.GetDataProtector(new[] { "XTI_Secrets" });
-                return new SharedFileSecretCredentialsFactory(dataProtector);
+                return new SharedFileSecretCredentialsFactory(xtiFolder, dataProtector);
             });
         }
     }

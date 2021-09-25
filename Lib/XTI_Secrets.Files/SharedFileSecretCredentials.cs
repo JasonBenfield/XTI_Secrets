@@ -1,21 +1,20 @@
 ﻿using Microsoft.AspNetCore.DataProtection;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using XTI_Core;
 
 namespace XTI_Secrets.Files
 {
-    public sealed class FileSecretCredentials : SecretCredentials
+    public sealed class SharedFileSecretCredentials : SecretCredentials
     {
-        private readonly SharedFileSecretCredentials sharedCredentials;
-        private readonly AppDataFolder appDataFolder;
+        private readonly AppDataFolder sharedAppDataFolder;
 
-        internal FileSecretCredentials(XtiFolder xtiFolder, string key, IDataProtector dataProtector)
+        internal SharedFileSecretCredentials(XtiFolder xtiFolder, string key, IDataProtector dataProtector)
             : base(key, dataProtector)
         {
-            sharedCredentials = new SharedFileSecretCredentials(xtiFolder, key, dataProtector);
-            appDataFolder = xtiFolder
-                .AppDataFolder()
+            sharedAppDataFolder = xtiFolder
+                .SharedAppDataFolder()
                 .WithSubFolder("Secrets");
         }
 
@@ -27,7 +26,9 @@ namespace XTI_Secrets.Files
             return File.Exists(filePath);
         }
 
-        protected override async Task<string> Load(string key)
+        protected override Task<string> Load(string key) => LoadShared(key);
+
+        internal async Task<string> LoadShared(string key)
         {
             string text;
             var filePath = getFilePath(key);
@@ -38,20 +39,20 @@ namespace XTI_Secrets.Files
             }
             else
             {
-                text = await sharedCredentials.LoadShared(key);
+                throw new ArgumentException("Secrets file was not found");
             }
             return text;
         }
 
         protected override async Task Persist(string key, string encryptedText)
         {
-            appDataFolder.TryCreate();
+            sharedAppDataFolder.TryCreate();
             using (var writer = new StreamWriter(getFilePath(key), false))
             {
                 await writer.WriteAsync(encryptedText);
             }
         }
 
-        private string getFilePath(string key) => appDataFolder.FilePath($"{key}.secret");
+        private string getFilePath(string key) => sharedAppDataFolder.FilePath($"{key}.secret");
     }
 }

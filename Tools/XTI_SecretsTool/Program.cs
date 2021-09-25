@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
 using System.Threading.Tasks;
 using XTI_Configuration.Extensions;
-using XTI_SecretsToolApi;
+using XTI_Core;
 using XTI_Secrets.Extensions;
+using XTI_SecretsToolApi;
 
 namespace XTI_SecretsTool
 {
@@ -24,9 +24,8 @@ namespace XTI_SecretsTool
                     (hostContext, services) =>
                     {
                         services.Configure<SecretsToolOptions>(hostContext.Configuration);
-                        services.AddXtiDataProtection();
+                        services.AddSingleton<XtiFolder>();
                         services.AddFileSecretCredentials();
-                        services.AddSharedFileSecretCredentials();
                         services.AddHostedService<SecretsHostedService>();
                     }
                 )

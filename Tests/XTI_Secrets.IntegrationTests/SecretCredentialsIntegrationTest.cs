@@ -4,6 +4,7 @@ using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
 using XTI_Configuration.Extensions;
+using XTI_Core;
 using XTI_Credentials;
 using XTI_Secrets.Extensions;
 
@@ -33,7 +34,7 @@ namespace XTI_Secrets.IntegrationTests
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddXtiDataProtection();
+                    services.AddSingleton<XtiFolder>();
                     services.AddFileSecretCredentials();
                 })
                 .Build();

@@ -1,19 +1,19 @@
 ﻿using Microsoft.AspNetCore.DataProtection;
-using Microsoft.Extensions.Hosting;
+using XTI_Core;
 
 namespace XTI_Secrets.Files
 {
     public sealed class FileSecretCredentialsFactory : SecretCredentialsFactory
     {
-        private readonly IHostEnvironment hostEnv;
+        private readonly XtiFolder xtiFolder;
 
-        public FileSecretCredentialsFactory(IHostEnvironment hostEnv, IDataProtector dataProtector)
+        public FileSecretCredentialsFactory(XtiFolder xtiFolder, IDataProtector dataProtector)
             : base(dataProtector)
         {
-            this.hostEnv = hostEnv;
+            this.xtiFolder = xtiFolder;
         }
 
         protected override SecretCredentials _Create(string key, IDataProtector dataProtector) =>
-            new FileSecretCredentials(hostEnv.EnvironmentName, key, dataProtector);
+            new FileSecretCredentials(xtiFolder, key, dataProtector);
     }
 }
