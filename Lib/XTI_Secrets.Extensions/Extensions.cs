@@ -9,10 +9,29 @@ namespace XTI_Secrets.Extensions
 {
     public static class Extensions
     {
-        public static void AddXtiDataProtection(this IServiceCollection services)
+        public static void AddFileSecretCredentials(this IServiceCollection services, IHostEnvironment hostEnv)
+        {
+            services.AddXtiDataProtection(hostEnv);
+            services.AddSingleton<ISecretCredentialsFactory>(sp =>
+            {
+                var xtiFolder = sp.GetService<XtiFolder>();
+                var dataProtector = sp.GetDataProtector(new[] { "XTI_Secrets" });
+                return new FileSecretCredentialsFactory(xtiFolder, dataProtector);
+            });
+            services.AddSingleton(sp => (SecretCredentialsFactory)sp.GetService<ISecretCredentialsFactory>());
+            services.AddSingleton<SharedSecretCredentialsFactory>(sp =>
+            {
+                var xtiFolder = sp.GetService<XtiFolder>();
+                var dataProtector = sp.GetDataProtector(new[] { "XTI_Secrets" });
+                return new SharedFileSecretCredentialsFactory(xtiFolder, dataProtector);
+            });
+        }
+
+        public static void AddXtiDataProtection(this IServiceCollection services, IHostEnvironment hostEnv)
         {
             const string appName = "XTI_App";
-            var keyDirPath = new AppDataFolder()
+            var keyDirPath = new XtiFolder(hostEnv)
+                .SharedAppDataFolder()
                 .WithSubFolder("Keys")
                 .Path();
             services
@@ -24,24 +43,5 @@ namespace XTI_Secrets.Extensions
                 .SetApplicationName(appName);
         }
 
-        public static void AddFileSecretCredentials(this IServiceCollection services)
-        {
-            services.AddSingleton<ISecretCredentialsFactory>(sp =>
-            {
-                var hostEnv = sp.GetService<IHostEnvironment>();
-                var dataProtector = sp.GetDataProtector(new[] { "XTI_Secrets" });
-                return new FileSecretCredentialsFactory(hostEnv, dataProtector);
-            });
-            services.AddSingleton(sp => (SecretCredentialsFactory)sp.GetService<ISecretCredentialsFactory>());
-        }
-
-        public static void AddSharedFileSecretCredentials(this IServiceCollection services)
-        {
-            services.AddSingleton<SharedSecretCredentialsFactory>(sp =>
-            {
-                var dataProtector = sp.GetDataProtector(new[] { "XTI_Secrets" });
-                return new SharedFileSecretCredentialsFactory(dataProtector);
-            });
-        }
     }
 }

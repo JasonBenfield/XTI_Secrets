@@ -4,9 +4,9 @@ using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
 using XTI_Configuration.Extensions;
+using XTI_Core;
 using XTI_Credentials;
 using XTI_Secrets.Extensions;
-using XTI_Secrets.Files;
 
 namespace XTI_Secrets.IntegrationTests
 {
@@ -64,15 +64,15 @@ namespace XTI_Secrets.IntegrationTests
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddXtiDataProtection();
-                    services.AddSharedFileSecretCredentials();
+                    services.AddSingleton<XtiFolder>();
+                    services.AddFileSecretCredentials(hostContext.HostingEnvironment);
                 })
                 .Build();
             var scope = host.Services.CreateScope();
             return scope.ServiceProvider;
         }
 
-        private SecretCredentialsFactory getSecretCredentialsFactory(IServiceProvider sp)
-            => sp.GetService<SharedFileSecretCredentialsFactory>();
+        private SharedSecretCredentialsFactory getSecretCredentialsFactory(IServiceProvider sp)
+            => sp.GetService<SharedSecretCredentialsFactory>();
     }
 }
