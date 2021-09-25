@@ -25,7 +25,7 @@ namespace XTI_SecretsTool
                     {
                         services.Configure<SecretsToolOptions>(hostContext.Configuration);
                         services.AddSingleton<XtiFolder>();
-                        services.AddFileSecretCredentials();
+                        services.AddFileSecretCredentials(hostContext.HostingEnvironment);
                         services.AddHostedService<SecretsHostedService>();
                     }
                 )

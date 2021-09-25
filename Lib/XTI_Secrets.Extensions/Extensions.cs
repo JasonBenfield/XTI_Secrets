@@ -9,20 +9,9 @@ namespace XTI_Secrets.Extensions
 {
     public static class Extensions
     {
-        public static void AddXtiDataProtection(this IServiceCollection services)
+        public static void AddFileSecretCredentials(this IServiceCollection services, IHostEnvironment hostEnv)
         {
-            const string appName = "XTI_App";
-            services
-                .AddDataProtection
-                (
-                    options => options.ApplicationDiscriminator = appName
-                )
-                .SetApplicationName(appName);
-        }
-
-        public static void AddFileSecretCredentials(this IServiceCollection services)
-        {
-            services.AddXtiDataProtection();
+            services.AddXtiDataProtection(hostEnv);
             services.AddSingleton<ISecretCredentialsFactory>(sp =>
             {
                 var xtiFolder = sp.GetService<XtiFolder>();
@@ -37,5 +26,22 @@ namespace XTI_Secrets.Extensions
                 return new SharedFileSecretCredentialsFactory(xtiFolder, dataProtector);
             });
         }
+
+        public static void AddXtiDataProtection(this IServiceCollection services, IHostEnvironment hostEnv)
+        {
+            const string appName = "XTI_App";
+            var keyDirPath = new XtiFolder(hostEnv)
+                .SharedAppDataFolder()
+                .WithSubFolder("Keys")
+                .Path();
+            services
+                .AddDataProtection
+                (
+                    options => options.ApplicationDiscriminator = appName
+                )
+                .PersistKeysToFileSystem(new DirectoryInfo(keyDirPath))
+                .SetApplicationName(appName);
+        }
+
     }
 }

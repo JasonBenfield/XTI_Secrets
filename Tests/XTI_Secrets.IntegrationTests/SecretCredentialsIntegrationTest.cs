@@ -35,7 +35,7 @@ namespace XTI_Secrets.IntegrationTests
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddSingleton<XtiFolder>();
-                    services.AddFileSecretCredentials();
+                    services.AddFileSecretCredentials(hostContext.HostingEnvironment);
                 })
                 .Build();
             var scope = host.Services.CreateScope();
