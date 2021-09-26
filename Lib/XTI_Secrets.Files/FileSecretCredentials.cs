@@ -24,7 +24,12 @@ namespace XTI_Secrets.Files
         protected override bool _Exist(string key)
         {
             var filePath = getFilePath(key);
-            return File.Exists(filePath);
+            var exists = File.Exists(filePath);
+            if (!exists)
+            {
+                exists = sharedCredentials.Exist();
+            }
+            return exists;
         }
 
         protected override async Task<string> Load(string key)
