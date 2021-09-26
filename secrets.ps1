@@ -43,7 +43,7 @@ function Secrets-CompleteIssue {
 
 function Secrets-Publish {
     param(
-        [ValidateSet("Development", "Production", "Staging", "Test")]
+        [ValidateSet("Development", "Production")]
         $EnvName = "Development"
     )
     $script:secretsConfig | Xti-Publish @PsBoundParameters
