@@ -28,9 +28,7 @@ function Secrets-NewIssue {
 function Secrets-StartIssue {
     param(
         [Parameter(Position=0)]
-        [long]$IssueNumber = 0,
-        $IssueBranchTitle = "",
-        $AssignTo = ""
+        [long]$IssueNumber = 0
     )
     $script:secretsConfig | Xti-StartIssue @PsBoundParameters
 }
