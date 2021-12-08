@@ -1,9 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿namespace XTI_Credentials;
 
-namespace XTI_Credentials
+public interface ICredentials
 {
-    public interface ICredentials
-    {
-        Task<CredentialValue> Value();
-    }
+    Task<CredentialValue> Value();
 }
