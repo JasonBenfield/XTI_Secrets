@@ -1,25 +1,49 @@
-﻿namespace XTI_SecretsToolApi
+﻿namespace XTI_SecretsToolApi;
+
+public sealed class SecretsToolOptions
 {
-    public sealed class SecretsToolOptions
+    private string command = "";
+    private string credentialKey = "";
+    private string userName = "";
+    private string password = "";
+
+    public string Command
     {
-        public string Command { get; set; }
-        public string CredentialKey { get; set; }
-        public string UserName { get; set; }
-        public string Password { get; set; }
-        public bool IsShared { get; set; }
+        get => command;
+        set => command = value ?? "";
+    }
 
-        public void CommandStore(string credentialKey, string userName, string password)
-        {
-            Command = "Store";
-            CredentialKey = credentialKey;
-            UserName = userName;
-            Password = password;
-        }
+    public string CredentialKey
+    {
+        get => credentialKey;
+        set => credentialKey = value ?? "";
+    }
 
-        public void CommandGet(string credentialKey)
-        {
-            Command = "Get";
-            CredentialKey = credentialKey;
-        }
+    public string UserName
+    {
+        get => userName;
+        set => userName = value ?? "";
+    }
+
+    public string Password
+    {
+        get => password;
+        set => password = value ?? "";
+    }
+
+    public bool IsShared { get; set; }
+
+    public void CommandStore(string credentialKey, string userName, string password)
+    {
+        Command = "Store";
+        CredentialKey = credentialKey;
+        UserName = userName;
+        Password = password;
+    }
+
+    public void CommandGet(string credentialKey)
+    {
+        Command = "Get";
+        CredentialKey = credentialKey;
     }
 }

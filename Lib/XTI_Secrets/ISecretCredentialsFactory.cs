@@ -1,7 +1,6 @@
-﻿namespace XTI_Secrets
+﻿namespace XTI_Secrets;
+
+public interface ISecretCredentialsFactory
 {
-    public interface ISecretCredentialsFactory
-    {
-        SecretCredentials Create(string key);
-    }
+    SecretCredentials Create(string key);
 }
