@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
 using System.Text.Json;
+using XTI_Core.Extensions;
 using XTI_Credentials;
 using XTI_Secrets.Fakes;
 
@@ -39,17 +39,9 @@ internal sealed class SecretCredentialsTest
 
     private IServiceProvider setup()
     {
-        var host = Host.CreateDefaultBuilder()
-            .ConfigureServices
-            (
-                services =>
-                {
-                    services.AddFakeSecretCredentials();
-                }
-            )
-            .Build();
-        var scope = host.Services.CreateScope();
-        return scope.ServiceProvider;
+        var builder = new XtiHostBuilder();
+        builder.Services.AddFakeSecretCredentials();
+        return builder.Build().Scope();
     }
 
     private FakeSecretCredentialsFactory getSecretCredentailsFactory(IServiceProvider sp)

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using XTI_Core;
 using XTI_Secrets.Files;
 
@@ -8,17 +7,20 @@ namespace XTI_Secrets.Extensions;
 
 public static class Extensions
 {
-    public static void AddFileSecretCredentials(this IServiceCollection services, IHostEnvironment hostEnv)
+    public static void AddFileSecretCredentials(this IServiceCollection services) =>
+        services.AddFileSecretCredentials(XtiEnvironment.Shared);
+
+    public static void AddFileSecretCredentials(this IServiceCollection services, XtiEnvironment environment)
     {
-        services.AddXtiDataProtection(hostEnv);
-        services.AddSingleton<ISecretCredentialsFactory>(sp =>
+        services.AddXtiDataProtection(environment);
+        services.AddScoped<ISecretCredentialsFactory>(sp =>
         {
             var xtiFolder = sp.GetRequiredService<XtiFolder>();
             var dataProtector = sp.GetDataProtector(new[] { "XTI_Secrets" });
             return new FileSecretCredentialsFactory(xtiFolder, dataProtector);
         });
-        services.AddSingleton(sp => (SecretCredentialsFactory)sp.GetRequiredService<ISecretCredentialsFactory>());
-        services.AddSingleton<ISharedSecretCredentialsFactory>(sp =>
+        services.AddScoped(sp => (SecretCredentialsFactory)sp.GetRequiredService<ISecretCredentialsFactory>());
+        services.AddScoped<ISharedSecretCredentialsFactory>(sp =>
         {
             var xtiFolder = sp.GetRequiredService<XtiFolder>();
             var dataProtector = sp.GetDataProtector(new[] { "XTI_Secrets" });
@@ -26,10 +28,13 @@ public static class Extensions
         });
     }
 
-    public static void AddXtiDataProtection(this IServiceCollection services, IHostEnvironment hostEnv)
+    public static void AddXtiDataProtection(this IServiceCollection services) =>
+        services.AddXtiDataProtection(XtiEnvironment.Shared);
+
+    public static void AddXtiDataProtection(this IServiceCollection services, XtiEnvironment environment)
     {
         const string appName = "XTI_App";
-        var keyDirPath = new XtiFolder(hostEnv)
+        var keyDirPath = new XtiFolder(environment)
             .SharedAppDataFolder()
             .WithSubFolder("Keys")
             .Path();
