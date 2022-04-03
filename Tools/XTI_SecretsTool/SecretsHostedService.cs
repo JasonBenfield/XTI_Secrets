@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using XTI_Credentials;
 using XTI_Secrets;
 using XTI_SecretsToolApi;
@@ -22,7 +21,7 @@ public sealed class SecretsHostedService : IHostedService
         using var scope = services.CreateScope();
         try
         {
-            var options = scope.ServiceProvider.GetRequiredService<IOptions<SecretsToolOptions>>().Value;
+            var options = scope.ServiceProvider.GetRequiredService<SecretsToolOptions>();
             if (string.IsNullOrWhiteSpace(options.CredentialKey))
             {
                 throw new ArgumentException("Credential Key is Required");

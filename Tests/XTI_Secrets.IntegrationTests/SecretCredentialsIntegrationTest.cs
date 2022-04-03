@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
-using XTI_Configuration.Extensions;
 using XTI_Core;
+using XTI_Core.Extensions;
 using XTI_Credentials;
 using XTI_Secrets.Extensions;
 
@@ -25,21 +24,14 @@ internal sealed class SecretCredentialsIntegrationTest
     private IServiceProvider setup()
     {
         Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", "Test");
-        var host = Host.CreateDefaultBuilder()
-            .ConfigureAppConfiguration((hostingContext, config) =>
-            {
-                config.UseXtiConfiguration(hostingContext.HostingEnvironment, new string[] { });
-            })
-            .ConfigureServices((hostContext, services) =>
-            {
-                services.AddSingleton<XtiFolder>();
-                services.AddFileSecretCredentials(hostContext.HostingEnvironment);
-            })
-            .Build();
-        var scope = host.Services.CreateScope();
-        return scope.ServiceProvider;
+        var hostBuilder = new XtiHostBuilder();
+        hostBuilder.Services.AddFileSecretCredentials();
+        var host = hostBuilder.Build();
+        var xtiEnv = host.GetRequiredService<XtiEnvironmentAccessor>();
+        xtiEnv.UseTest();
+        return host.Scope();
     }
 
-    private SecretCredentialsFactory getSecretCredentialsFactory(IServiceProvider sp)
-        => sp.GetRequiredService<SecretCredentialsFactory>();
+    private ISecretCredentialsFactory getSecretCredentialsFactory(IServiceProvider sp)
+        => sp.GetRequiredService<ISecretCredentialsFactory>();
 }

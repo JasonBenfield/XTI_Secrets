@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using XTI_Configuration.Extensions;
 using XTI_Core;
+using XTI_Core.Extensions;
 using XTI_Secrets.Extensions;
 using XTI_SecretsTool;
 using XTI_SecretsToolApi;
@@ -11,16 +11,16 @@ await Host.CreateDefaultBuilder(args)
     (
         (hostContext, configuration) =>
         {
-            configuration.UseXtiConfiguration(hostContext.HostingEnvironment, args);
+            configuration.UseXtiConfiguration(hostContext.HostingEnvironment, "", "", args);
         }
     )
     .ConfigureServices
     (
         (hostContext, services) =>
         {
-            services.Configure<SecretsToolOptions>(hostContext.Configuration);
-            services.AddSingleton<XtiFolder>();
-            services.AddFileSecretCredentials(hostContext.HostingEnvironment);
+            services.AddSingleton(_ => new XtiEnvironment(hostContext.HostingEnvironment.EnvironmentName));
+            services.AddConfigurationOptions<SecretsToolOptions>();
+            services.AddFileSecretCredentials();
             services.AddHostedService<SecretsHostedService>();
         }
     )

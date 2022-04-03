@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
-using XTI_Configuration.Extensions;
 using XTI_Core;
+using XTI_Core.Extensions;
 using XTI_Credentials;
 using XTI_Secrets.Extensions;
 
@@ -10,6 +9,15 @@ namespace XTI_Secrets.IntegrationTests;
 
 internal sealed class SharedSecretCredentialsIntegrationTest
 {
+    [Test]
+    public async Task ShouldRetrieveGitHubCredentials()
+    {
+        var sp = setup();
+        var factory = getSecretCredentialsFactory(sp);
+        var secretCredentials = factory.Create("GitHub");
+        var cred = await secretCredentials.Value();
+    }
+
     [Test]
     public async Task ShouldStoreAndRetrieveCredentials()
     {
@@ -54,20 +62,12 @@ internal sealed class SharedSecretCredentialsIntegrationTest
 
     private IServiceProvider setup(string envName = "Test")
     {
-        Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", envName);
-        var host = Host.CreateDefaultBuilder()
-            .ConfigureAppConfiguration((hostingContext, config) =>
-            {
-                config.UseXtiConfiguration(hostingContext.HostingEnvironment, new string[] { });
-            })
-            .ConfigureServices((hostContext, services) =>
-            {
-                services.AddSingleton<XtiFolder>();
-                services.AddFileSecretCredentials(hostContext.HostingEnvironment);
-            })
-            .Build();
-        var scope = host.Services.CreateScope();
-        return scope.ServiceProvider;
+        var hostBuilder = new XtiHostBuilder();
+        hostBuilder.Services.AddFileSecretCredentials();
+        var host = hostBuilder.Build();
+        var env = host.GetRequiredService<XtiEnvironmentAccessor>();
+        env.UseEnvironment(envName);
+        return host.Scope();
     }
 
     private ISharedSecretCredentialsFactory getSecretCredentialsFactory(IServiceProvider sp)
