@@ -13,16 +13,16 @@ public static class Extensions
     public static void AddFileSecretCredentials(this IServiceCollection services, XtiEnvironment environment)
     {
         services.AddXtiDataProtection(environment);
-        services.AddScoped<ISecretCredentialsFactory>(sp =>
+        services.AddSingleton<ISecretCredentialsFactory>(sp =>
         {
-            var xtiFolder = sp.GetRequiredService<XtiFolder>();
+            var xtiFolder = new XtiFolder(environment);
             var dataProtector = sp.GetDataProtector(new[] { "XTI_Secrets" });
             return new FileSecretCredentialsFactory(xtiFolder, dataProtector);
         });
-        services.AddScoped(sp => (SecretCredentialsFactory)sp.GetRequiredService<ISecretCredentialsFactory>());
-        services.AddScoped<ISharedSecretCredentialsFactory>(sp =>
+        services.AddSingleton(sp => (SecretCredentialsFactory)sp.GetRequiredService<ISecretCredentialsFactory>());
+        services.AddSingleton<ISharedSecretCredentialsFactory>(sp =>
         {
-            var xtiFolder = sp.GetRequiredService<XtiFolder>();
+            var xtiFolder = new XtiFolder(environment);
             var dataProtector = sp.GetDataProtector(new[] { "XTI_Secrets" });
             return new SharedFileSecretCredentialsFactory(xtiFolder, dataProtector);
         });
