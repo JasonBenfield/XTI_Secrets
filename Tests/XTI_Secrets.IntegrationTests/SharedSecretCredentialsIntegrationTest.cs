@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using XTI_Core;
 using XTI_Core.Extensions;
 using XTI_Credentials;
 using XTI_Secrets.Extensions;
@@ -62,11 +61,10 @@ internal sealed class SharedSecretCredentialsIntegrationTest
 
     private IServiceProvider setup(string envName = "Test")
     {
+        Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", envName);
         var hostBuilder = new XtiHostBuilder();
         hostBuilder.Services.AddFileSecretCredentials();
         var host = hostBuilder.Build();
-        var env = host.GetRequiredService<XtiEnvironmentAccessor>();
-        env.UseEnvironment(envName);
         return host.Scope();
     }
 
