@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using System.Text.Json;
 using XTI_Core;
 using XTI_Core.Extensions;
 using XTI_Credentials;
@@ -21,14 +22,23 @@ internal sealed class SecretCredentialsIntegrationTest
         Assert.That(retrievedCredentials, Is.EqualTo(storedCredentials), "Should store and retrieve credentials");
     }
 
-    private IServiceProvider setup()
+    [Test]
+    public async Task ShouldInstallation()
     {
-        Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", "Test");
-        var hostBuilder = new XtiHostBuilder();
-        hostBuilder.Services.AddFileSecretCredentials();
+        var sp = setup("Development");
+        var factory = getSecretCredentialsFactory(sp);
+        var secretCredentials = factory.Create("Installation");
+        var retrievedCredentials = await secretCredentials.Value();
+        Console.WriteLine(JsonSerializer.Serialize(retrievedCredentials, new JsonSerializerOptions { WriteIndented = true}));
+    }
+
+    private IServiceProvider setup(string envName = "Test")
+    {
+        Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", envName);
+        var xtiEnv = XtiEnvironment.Parse(envName);
+        var hostBuilder = new XtiHostBuilder(xtiEnv);
+        hostBuilder.Services.AddFileSecretCredentials(xtiEnv);
         var host = hostBuilder.Build();
-        var xtiEnv = host.GetRequiredService<XtiEnvironmentAccessor>();
-        xtiEnv.UseTest();
         return host.Scope();
     }
 
