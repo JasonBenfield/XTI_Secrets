@@ -36,7 +36,7 @@ public sealed class SharedFileSecretCredentials : SecretCredentials
         }
         else
         {
-            throw new ArgumentException("Secrets file was not found");
+            throw new ArgumentException($"Secrets file for '{key}' was not found");
         }
         return text;
     }
